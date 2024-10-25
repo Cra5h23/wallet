@@ -7,6 +7,10 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ * @author Nikolay Radzivon
+ * @Date 24.10.2024
+ */
 @Getter
 @Setter
 @Entity
