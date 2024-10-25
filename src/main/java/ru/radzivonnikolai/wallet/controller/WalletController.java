@@ -10,7 +10,7 @@ import ru.radzivonnikolai.wallet.service.WalletService;
 import java.util.UUID;
 
 /**
- * @author Nikolay Radzivon
+ * @author Nikolai Radzivon
  * @Date 24.10.2024
  */
 @RestController

@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
- * @author Nikolay Radzivon
+ * @author Nikolai Radzivon
  * @Date 24.10.2024
  */
 @Slf4j
@@ -91,8 +91,7 @@ public class WalletServiceImpl implements WalletService {
     public Object createWallet() {
         Wallet wallet = new Wallet();
 
-        wallet.setAmount(BigDecimal.valueOf(1000));
-
+        wallet.setAmount(BigDecimal.ZERO);
         save(wallet);
         return wallet;
     }

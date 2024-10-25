@@ -7,7 +7,7 @@ import ru.radzivonnikolai.wallet.dto.WalletResponseDto;
 import java.util.UUID;
 
 /**
- * @author Nikolay Radzivon
+ * @author Nikolai Radzivon
  * @Date 24.10.2024
  */
 public interface WalletService {
