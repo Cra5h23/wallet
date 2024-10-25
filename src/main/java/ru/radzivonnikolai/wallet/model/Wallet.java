@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -16,4 +17,6 @@ public class Wallet {
     @Column(name = "id", nullable = false)
     private UUID id;
 
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
 }
