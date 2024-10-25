@@ -22,6 +22,7 @@ public class WalletController {
 
     @PostMapping("/wallet")
     public ResponseEntity<Object> updateBalance(@RequestBody WalletRequestDto dto) {
+        log.info("Получен запрос: POST /api/v1/wallet body={}", dto);
         return ResponseEntity
                 .ok(service.updateBalance(dto));
     }
