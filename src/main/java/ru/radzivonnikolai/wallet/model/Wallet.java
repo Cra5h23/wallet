@@ -14,13 +14,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "wallet")
+@Table(name = "wallets")
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false, unique = true)
     private UUID id;
 
-    @Column(name = "amount", nullable = false)
+    @Column(name = "amount")
     private BigDecimal amount;
 }
