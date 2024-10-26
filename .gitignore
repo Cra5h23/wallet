@@ -39,3 +39,4 @@ mvnw.cmd
 amplicode.xml
 /docker/pgadmin/pgpass
 /docker/pgadmin/servers.json
+.env
