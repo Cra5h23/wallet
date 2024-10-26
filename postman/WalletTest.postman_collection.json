@@ -1,0 +1,519 @@
+{
+	"info": {
+		"_postman_id": "6cc1f482-9283-45fe-8dc7-265914662ea4",
+		"name": "WalletTest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32584181"
+	},
+	"item": [
+		{
+			"name": "Создание нового кошелька",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код ответа 201\", function() {\r",
+							"    pm.response.to.have.status(201);    \r",
+							"})\r",
+							"\r",
+							"pm.test(\"Ответ должен содержать ссылку на кошелёк\", function() {\r",
+							"    pm.response.to.be.withBody;\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Ответ является строкой\", function () {\r",
+							"    pm.expect(pm.response.text()).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ соответствует ожидаемому формату URL\", function () {\r",
+							"    const responseUrl = pm.response.text().replace(/^\"|\"$/g, '');\r",
+							"    pm.expect(responseUrl).to.match(/^http:\\/\\/localhost:8080\\/api\\/v1\\/wallets\\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);\r",
+							"});\r",
+							"\r",
+							"const url = pm.response.text();\r",
+							"if (typeof url === 'string' && url.length > 0) {\r",
+							"    const walletId = url.substring(url.lastIndexOf('/') + 1);\r",
+							"    const cleanedWalletId = walletId.replace(/^\"|\"$|'/g, '');\r",
+							"    pm.collectionVariables.set(\"walletId\", cleanedWalletId);\r",
+							"    console.log(walletId);\r",
+							"} else {\r",
+							"    console.error(\"URL не определен или не является строкой\");\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Пополнение баланса",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус ответа 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ является строкой\", function () {\r",
+							"    pm.expect(pm.response.text()).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"const responseText = pm.response.text();\r",
+							"const expectedId = pm.collectionVariables.get(\"walletId\");\r",
+							"const expectedResponse = `На баланс кошелька с id: ${expectedId} добавлено 1000. Текущий баланс 1000`;\r",
+							"\r",
+							"pm.test(\"Ответ соответствует ожидаемому тексту\", function () {\r",
+							"    pm.expect(responseText).to.equal(expectedResponse);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"walletId\": \"{{walletId}}\",\r\n    \"operationType\": \"DEPOSIT\",\r\n    \"amount\": 1000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/wallet",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"wallet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Снятие с баланса",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус ответа 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ является строкой\", function () {\r",
+							"    pm.expect(pm.response.text()).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"const responseText = pm.response.text();\r",
+							"const expectedId = pm.collectionVariables.get(\"walletId\");\r",
+							"const expectedResponse = `С баланса кошелька с id: ${expectedId} снято 100. Текущий баланс 900`;\r",
+							"\r",
+							"pm.test(\"Ответ соответствует ожидаемому тексту\", function () {\r",
+							"    pm.expect(responseText).to.equal(expectedResponse);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"walletId\": \"{{walletId}}\",\r\n    \"operationType\": \"WITHDRAW\",\r\n    \"amount\": 100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/wallet",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"wallet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Сумма снятия больше чем баланс счёта",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус ответа 402\", function () {\r",
+							"    pm.response.to.have.status(402);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ является JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Ответ содержит необходимые поля\", function () {\r",
+							"    pm.expect(responseJson).to.have.all.keys('reason', 'status', 'message', 'timestamp', 'path');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Проверка значений полей\", function () {\r",
+							"    pm.expect(responseJson.reason).to.equal(\"Payment Required\");\r",
+							"    pm.expect(responseJson.status).to.equal(\"PAYMENT_REQUIRED\");\r",
+							"    \r",
+							"    const expectedId = pm.collectionVariables.get(\"walletId\");\r",
+							"    const expectedMessage = `На балансе кошелька с id: ${expectedId} не хватает денег`;\r",
+							"    pm.expect(responseJson.message).to.equal(expectedMessage);\r",
+							"    \r",
+							"    pm.expect(responseJson.timestamp).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}$/);\r",
+							"    \r",
+							"    pm.expect(responseJson.path).to.equal(\"/api/v1/wallet\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"walletId\": \"{{walletId}}\",\r\n    \"operationType\": \"WITHDRAW\",\r\n    \"amount\": 1000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/wallet",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"wallet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Неправильно введённый тип операции",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус ответа 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ является JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Ответ содержит необходимые поля\", function () {\r",
+							"    pm.expect(responseJson).to.have.all.keys('reason', 'status', 'message', 'timestamp', 'path');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Проверка значений полей\", function () {\r",
+							"    pm.expect(responseJson.reason).to.equal(\"Bad Request\");\r",
+							"    pm.expect(responseJson.status).to.equal(\"BAD_REQUEST\");\r",
+							"    \r",
+							"    pm.expect(responseJson.message).to.include(\"JSON parse error: Cannot deserialize value of type `ru.radzivonnikolai.wallet.dto.OperationType` from String\");\r",
+							"    pm.expect(responseJson.message).to.include(\"not one of the values accepted for Enum class: [WITHDRAW, DEPOSIT]\");\r",
+							"    \r",
+							"    pm.expect(responseJson.timestamp).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}$/);\r",
+							"    \r",
+							"    pm.expect(responseJson.path).to.equal(\"/api/v1/wallet\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"walletId\": \"{{walletId}}\",\r\n    \"operationType\": \"WITHфвW\",\r\n    \"amount\": 1000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/wallet",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"wallet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "В качестве amount введено отрицательное число",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Статус ответа 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ является JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Ответ содержит необходимые поля\", function () {\r",
+							"    pm.expect(responseJson).to.have.all.keys('reason', 'status', 'message', 'timestamp', 'path');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Проверка значений полей\", function () {\r",
+							"    pm.expect(responseJson.reason).to.equal(\"Bad Request\");\r",
+							"    pm.expect(responseJson.status).to.equal(\"BAD_REQUEST\");\r",
+							"    \r",
+							"    pm.expect(responseJson.message).to.include(\"Validation failed for argument\");\r",
+							"    pm.expect(responseJson.message).to.include(\"amount cannot be negative\");\r",
+							"    pm.expect(responseJson.message).to.include(\"id cannot be null\");\r",
+							"    \r",
+							"    pm.expect(responseJson.timestamp).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}$/);\r",
+							"   \r",
+							"    pm.expect(responseJson.path).to.equal(\"/api/v1/wallet\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"walletId\": \"\",\r\n    \"operationType\": \"DEPOSIT\",\r\n    \"amount\": -1000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/wallet",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"wallet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение только что созданного кошелька",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус ответа 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ является JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Ответ содержит необходимые поля\", function () {\r",
+							"    pm.expect(responseJson).to.have.all.keys('walletId', 'amount');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Проверка значений полей\", function () {\r",
+							"    pm.expect(responseJson.walletId).to.equal(pm.collectionVariables.get(\"walletId\"));\r",
+							"    pm.expect(responseJson.amount).to.equal(900);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/wallets/{{walletId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"wallets",
+						"{{walletId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение кошелька с id 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус ответа 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ является JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Ответ содержит необходимые поля\", function () {\r",
+							"    pm.expect(responseJson).to.have.all.keys('reason', 'status', 'message', 'timestamp', 'path');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Проверка значений полей\", function () {\r",
+							"    pm.expect(responseJson.reason).to.equal(\"Bad Request\");\r",
+							"    pm.expect(responseJson.status).to.equal(\"BAD_REQUEST\");\r",
+							"    pm.expect(responseJson.message).to.equal(\"Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: 1\");\r",
+							"    \r",
+							"     pm.expect(responseJson.timestamp).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}$/);\r",
+							"\r",
+							"    pm.expect(responseJson.path).to.equal(\"/api/v1/wallets/1\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/wallets/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"wallets",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "walletId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
