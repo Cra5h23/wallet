@@ -50,7 +50,7 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/v1",
+					"raw": "http://localhost:8080/api/v1/new-wallet",
 					"protocol": "http",
 					"host": [
 						"localhost"
