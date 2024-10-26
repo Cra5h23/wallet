@@ -20,4 +20,4 @@ jobs:
         run: npm install -g newman
 
       - name: Run Postman tests
-        run: newman run path/to/your/collection.json -e path/to/your/environment.json
+        run: newman run postman/Wallet.postman_collection.json -e postman/environment.json
