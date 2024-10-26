@@ -4,6 +4,7 @@ package ru.radzivonnikolai.wallet.service;
 import ru.radzivonnikolai.wallet.dto.WalletRequestDto;
 import ru.radzivonnikolai.wallet.dto.WalletResponseDto;
 
+import java.net.URI;
 import java.util.UUID;
 
 /**
@@ -15,5 +16,5 @@ public interface WalletService {
 
     WalletResponseDto getWallet(UUID walletId);
 
-    Object createWallet(); //Todo
+    URI createWallet();
 }
