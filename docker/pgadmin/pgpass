@@ -1,0 +1,1 @@
+postgres:5432:wallet-db:postgres:postgres_secret
