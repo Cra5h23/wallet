@@ -15,6 +15,8 @@ import ru.radzivonnikolai.wallet.repository.WalletRepository;
 import ru.radzivonnikolai.wallet.service.WalletService;
 
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 /**
@@ -28,39 +30,72 @@ public class WalletServiceImpl implements WalletService {
     private final WalletRepository repository;
     private final WalletMapper mapper;
 
+    /**
+     * Метод для обновления баланса кошелька.
+     * Если входные данные некорректны (walletId, amount или operationType равны null),
+     * метод выбрасывает NotFoundWalletException с сообщением "Not found wallet".
+     *
+     * @param dto объект DTO с данными для обновления баланса
+     * @return строка с информацией о результате операции
+     */
     @Override
     @Transactional
     public String updateBalance(WalletRequestDto dto) {
-        var uuid = dto.walletId();
-        var wallet = checkWallet(uuid);
+        if (dto == null || dto.walletId() == null || dto.amount() == null || dto.operationType() == null) {
+            throw new NotFoundWalletException("Not found wallet");
+        }
+
+        log.info("Получен запрос на обновление баланса кошелька {}", dto);
+        var walletId = dto.walletId();
+        var wallet = checkWallet(walletId);
         var operationType = dto.operationType();
 
         switch (operationType) {
             case DEPOSIT -> {
                 var v = deposit(wallet, dto.amount());
                 save(v);
-                return "На кошелёк %s добавлено %s".formatted(wallet.getId(), dto.amount());
+                return "На баланс кошелька с id: %s добавлено %s. Текущий баланс %s"
+                        .formatted(wallet.getId(), dto.amount(), v.getAmount());
             }
             case WITHDRAW -> {
                 var v = withdraw(wallet, dto.amount());
                 save(v);
-                return "С кошелька %s снято %s".formatted(wallet.getId(), dto.amount());
+                return "С баланса кошелька с id: %s снято %s. Текущий баланс %s"
+                        .formatted(wallet.getId(), dto.amount(), v.getAmount());
             }
-            default -> throw new PaymentRequiredWalletException("Not enough money");// todo изменить
+            default -> throw new PaymentRequiredWalletException("Такой операции не существует");
         }
     }
 
-    private void save(Wallet wallet) {
-        repository.save(wallet);
+    /**
+     * Метод для сохранения кошелька в репозитории.
+     *
+     * @param wallet кошелек для сохранения
+     * @return сохраненный кошелек
+     */
+    private Wallet save(Wallet wallet) {
+        return repository.save(wallet);
     }
 
-
+    /**
+     * Метод для проверки существования кошелька по id.
+     * Если кошелек не найден, метод выбрасывает NotFoundWalletException.
+     *
+     * @param id id кошелька
+     * @return кошелек по id
+     */
     private Wallet checkWallet(UUID id) {
         return repository.findById(id)
-                .orElseThrow(() -> new NotFoundWalletException("Wallet %s not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundWalletException("Кошелёк с id: %s не найден".formatted(id)));
     }
 
-
+    /**
+     * Метод для пополнения баланса кошелька.
+     *
+     * @param wallet кошелек для пополнения
+     * @param amount сумма пополнения
+     * @return кошелек с обновленным балансом
+     */
     private Wallet deposit(Wallet wallet, BigDecimal amount) {
         var amount1 = wallet.getAmount();
         var sum = amount1.add(amount);
@@ -68,31 +103,58 @@ public class WalletServiceImpl implements WalletService {
         return wallet;
     }
 
+    /**
+     * Метод для списания со счета кошелька.
+     * Если на балансе кошелька недостаточно средств, метод выбрасывает PaymentRequiredWalletException.
+     *
+     * @param wallet кошелек для списания
+     * @param amount сумма списания
+     * @return кошелек с обновленным балансом
+     */
     private Wallet withdraw(Wallet wallet, BigDecimal amount) {
         var amount1 = wallet.getAmount();
 
-        if (amount1.compareTo(amount) > 0) {
+        if (amount1.compareTo(amount) >= 0) {
             wallet.setAmount(amount1.subtract(amount));
         } else {
-            throw new PaymentRequiredWalletException("Not enough money");
+            throw new PaymentRequiredWalletException("На балансе кошелька с id: %s не хватает денег"
+                    .formatted(wallet.getId()));
         }
         return wallet;
     }
 
+    /**
+     * Метод для получения кошелька по id.
+     *
+     * @param walletId id кошелька
+     * @return DTO с данными кошелька
+     */
     @Override
     @Transactional(readOnly = true)
     public WalletResponseDto getWallet(UUID walletId) {
-        Wallet wallet = checkWallet(walletId);
+        log.info("Получен запрос на получение баланса кошелька {}", walletId);
+        var wallet = checkWallet(walletId);
 
         return mapper.toWalletResponseDto(wallet);
     }
 
+    /**
+     * Метод для создания нового кошелька.
+     *
+     * @return URI нового кошелька
+     */
     @Override
-    public Object createWallet() {
-        Wallet wallet = new Wallet();
+    @Transactional
+    public URI createWallet() {
+        var wallet = save(new Wallet());
 
-        wallet.setAmount(BigDecimal.ZERO);
-        save(wallet);
-        return wallet;
+        try {
+            URI uri = new URI("http://localhost:8080/api/v1/wallets/%s".formatted(wallet.getId()));
+            log.info("Создан новый кошелёк с id: {} и ссылкой {}", wallet.getId(), uri);
+
+            return uri;
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
