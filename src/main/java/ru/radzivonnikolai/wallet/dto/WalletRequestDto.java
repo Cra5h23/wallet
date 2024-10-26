@@ -1,7 +1,7 @@
 package ru.radzivonnikolai.wallet.dto;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -12,5 +12,6 @@ import java.util.UUID;
  */
 public record WalletRequestDto(@NotNull(message = "id cannot be null") UUID walletId,
                                @NotNull(message = "Operation cannot be null") OperationType operationType,
-                               @Positive(message = "amount cannot be negative") BigDecimal amount) {
+                               @Positive(message = "amount cannot be negative") @NotNull(message = "amount cannot be null")
+                               BigDecimal amount) {
 }
