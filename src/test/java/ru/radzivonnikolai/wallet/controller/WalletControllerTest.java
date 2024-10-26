@@ -208,7 +208,7 @@ class WalletControllerTest {
     @Test
     void createNewWalletTest() {
         var postResponse = testRestTemplate.exchange(
-                "http://localhost:" + localServerPort + "/api/v1",
+                "http://localhost:" + localServerPort + "/api/v1/new-wallet",
                 HttpMethod.POST,
                 new HttpEntity<>(null),
                 Object.class
