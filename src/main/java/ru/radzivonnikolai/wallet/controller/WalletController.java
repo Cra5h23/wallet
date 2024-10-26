@@ -61,7 +61,7 @@ public class WalletController {
      *
      * @return ответ с кодом состояния HTTP и телом ответа
      */
-    @PostMapping
+    @PostMapping("/new-wallet")
     public ResponseEntity<Object> createWallet() {
         log.info("Получен запрос: POST /api/v1");
 
