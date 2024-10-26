@@ -22,5 +22,5 @@ public class Wallet {
     private UUID id;
 
     @Column(name = "amount")
-    private BigDecimal amount;
+    private BigDecimal amount = BigDecimal.ZERO;
 }
