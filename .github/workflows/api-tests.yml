@@ -14,7 +14,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'  # Выберите версию Node.js, которая вам нужна
+          node-version: '16'  # Выберите версию Node.js, которая вам нужна
 
       - name: Install Newman
         run: npm install -g newman
