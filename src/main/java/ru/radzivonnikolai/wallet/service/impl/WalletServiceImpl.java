@@ -52,16 +52,18 @@ public class WalletServiceImpl implements WalletService {
 
         switch (operationType) {
             case DEPOSIT -> {
-                var v = deposit(wallet, dto.amount());
-                save(v);
+                var w = deposit(wallet, dto.amount());
+
+                save(w);
                 return "На баланс кошелька с id: %s добавлено %s. Текущий баланс %s"
-                        .formatted(wallet.getId(), dto.amount(), v.getAmount());
+                        .formatted(wallet.getId(), dto.amount(), w.getAmount());
             }
             case WITHDRAW -> {
-                var v = withdraw(wallet, dto.amount());
-                save(v);
+                var w = withdraw(wallet, dto.amount());
+
+                save(w);
                 return "С баланса кошелька с id: %s снято %s. Текущий баланс %s"
-                        .formatted(wallet.getId(), dto.amount(), v.getAmount());
+                        .formatted(wallet.getId(), dto.amount(), w.getAmount());
             }
             default -> throw new PaymentRequiredWalletException("Такой операции не существует");
         }
@@ -97,8 +99,9 @@ public class WalletServiceImpl implements WalletService {
      * @return кошелек с обновленным балансом
      */
     private Wallet deposit(Wallet wallet, BigDecimal amount) {
-        var amount1 = wallet.getAmount();
-        var sum = amount1.add(amount);
+        var walletAmount = wallet.getAmount();
+        var sum = walletAmount.add(amount);
+
         wallet.setAmount(sum);
         return wallet;
     }
@@ -112,10 +115,10 @@ public class WalletServiceImpl implements WalletService {
      * @return кошелек с обновленным балансом
      */
     private Wallet withdraw(Wallet wallet, BigDecimal amount) {
-        var amount1 = wallet.getAmount();
+        var walletAmount = wallet.getAmount();
 
-        if (amount1.compareTo(amount) >= 0) {
-            wallet.setAmount(amount1.subtract(amount));
+        if (walletAmount.compareTo(amount) >= 0) {
+            wallet.setAmount(walletAmount.subtract(amount));
         } else {
             throw new PaymentRequiredWalletException("На балансе кошелька с id: %s не хватает денег"
                     .formatted(wallet.getId()));
@@ -149,7 +152,7 @@ public class WalletServiceImpl implements WalletService {
         var wallet = save(new Wallet());
 
         try {
-            URI uri = new URI("http://localhost:8080/api/v1/wallets/%s".formatted(wallet.getId()));
+            var uri = new URI("http://localhost:8080/api/v1/wallets/%s".formatted(wallet.getId()));
             log.info("Создан новый кошелёк с id: {} и ссылкой {}", wallet.getId(), uri);
 
             return uri;
